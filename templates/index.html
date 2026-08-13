@@ -1,1 +1,4339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LeadScout — Smart Lead Prioritization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>"/>
+    <style>
+        /* ============================================================
+           LEAD SCOUT - MAIN APPLICATION STYLES
+           Dynamic Blue Theme
+           ============================================================ */
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0e1a;
+            min-height: 100vh;
+            color: #e0e8f0;
+            overflow-x: hidden;
+        }
+
+        /* ===== BACKGROUND GLOW EFFECTS ===== */
+        .bg-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow-1 {
+            width: 600px;
+            height: 600px;
+            top: -200px;
+            right: -200px;
+            background: rgba(0, 150, 255, 0.15);
+        }
+
+        .bg-glow-2 {
+            width: 500px;
+            height: 500px;
+            bottom: -150px;
+            left: -150px;
+            background: rgba(0, 200, 255, 0.10);
+        }
+
+        .bg-glow-3 {
+            width: 400px;
+            height: 400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 100, 255, 0.05);
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 150, 255, 0.15);
+            border-radius: 16px;
+            padding: 16px 28px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #0080ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-sub {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 400;
+            display: block;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 200, 100, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 200, 100, 0.2);
+            flex-wrap: wrap;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00e676;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .header-user {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+        }
+
+        .header-logout {
+            color: #ff5252;
+            font-size: 0.75rem;
+            text-decoration: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            background: rgba(255, 50, 50, 0.1);
+            border: 1px solid rgba(255, 50, 50, 0.2);
+            transition: all 0.3s;
+        }
+
+        .header-logout:hover {
+            background: rgba(255, 50, 50, 0.2);
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 6px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(0, 150, 255, 0.08);
+            flex-wrap: wrap;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 10px 22px;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: linear-gradient(135deg, rgba(0, 128, 255, 0.2), rgba(0, 212, 255, 0.1));
+            box-shadow: 0 0 20px rgba(0, 128, 255, 0.1);
+        }
+
+        .tab-icon {
+            font-size: 1rem;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 150, 255, 0.12);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 150, 255, 0.3);
+            box-shadow: 0 8px 40px rgba(0, 100, 255, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .card-icon {
+            font-size: 1.4rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* ===== MAIN GRID ===== */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+        }
+
+        /* ===== FORM ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: #e0e8f0;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+            width: 100%;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #0080ff;
+            box-shadow: 0 0 0 3px rgba(0, 128, 255, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group small {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-group select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 12px;
+            padding-right: 36px;
+        }
+
+        .form-group select option {
+            background: #1a1f2e;
+            color: #e0e8f0;
+        }
+
+        /* ===== PREDICT BUTTON ===== */
+        .predict-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 16px;
+            background: linear-gradient(135deg, #0080ff, #00d4ff);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: transform 0.2s, box-shadow 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 128, 255, 0.4);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+        }
+
+        .predict-btn .btn-shimmer {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .predict-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== VALIDATION MESSAGE ===== */
+        .validation-message {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 50, 50, 0.15);
+            border: 1px solid rgba(255, 50, 50, 0.25);
+            border-radius: 10px;
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* ===== RESULTS ===== */
+        .result-empty {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .result-empty .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .result-empty h3 {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+        }
+
+        .result-empty p {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.9rem;
+        }
+
+        .result-active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .result-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .result-prediction,
+        .result-recommendation {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .result-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .result-value.yes {
+            color: #00e676;
+        }
+
+        .result-value.no {
+            color: #ff5252;
+        }
+
+        .result-value.high {
+            color: #00e676;
+            background: rgba(0, 230, 118, 0.1);
+            padding: 4px 16px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .result-value.low {
+            color: #ff5252;
+            background: rgba(255, 82, 82, 0.1);
+            padding: 4px 16px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        /* ===== GAUGE ===== */
+        .gauge-container {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 20px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .gauge-track {
+            position: relative;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: visible;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #ff5252, #ffab40, #00e676);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+
+        .gauge-thumb {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #0080ff, #00d4ff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 30px rgba(0, 128, 255, 0.4);
+            left: 0%;
+        }
+
+        .gauge-value {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* ===== RESULT DETAILS ===== */
+        .result-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .detail-value:first-child {
+            color: #ff5252;
+        }
+
+        .detail-value:last-child {
+            color: #00e676;
+        }
+
+        /* ===== RESULT MESSAGE ===== */
+        .result-message {
+            text-align: center;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .result-message.success {
+            background: rgba(0, 230, 118, 0.08);
+            border-color: rgba(0, 230, 118, 0.2);
+            color: #00e676;
+        }
+
+        .result-message.fail {
+            background: rgba(255, 82, 82, 0.08);
+            border-color: rgba(255, 82, 82, 0.2);
+            color: #ff5252;
+        }
+
+        /* ===== CONFIDENCE BAR ===== */
+        .confidence-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .confidence-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 500;
+            min-width: 80px;
+        }
+
+        .confidence-track {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #0080ff, #00d4ff);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 0%;
+        }
+
+        .confidence-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #00d4ff;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* ===== SCORE BREAKDOWN ===== */
+        .score-breakdown {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(0, 150, 255, 0.08);
+            margin-top: 12px;
+        }
+
+        .score-factor {
+            margin-bottom: 8px;
+        }
+
+        .score-bar-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .score-bar-fill.high {
+            background: linear-gradient(90deg, #00e676, #00c9a7);
+        }
+
+        .score-bar-fill.medium {
+            background: linear-gradient(90deg, #ffab40, #ff9100);
+        }
+
+        .score-bar-fill.low {
+            background: linear-gradient(90deg, #ff5252, #ff1744);
+        }
+
+        .total-score {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #0080ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        #scoreInsights {
+            background: rgba(0, 128, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px 16px;
+            border-left: 3px solid #0080ff;
+        }
+
+        #scoreInsights h5 {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================================ */
+        /* DASHBOARD */
+        /* ============================================================ */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 20px 24px;
+            border: 1px solid rgba(0, 150, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0, 150, 255, 0.25);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(0, 150, 255, 0.08);
+        }
+
+        .chart-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 16px;
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 200px;
+            padding: 10px 0;
+        }
+
+        .chart-bar-container {
+            display: flex;
+            gap: 60px;
+            align-items: flex-end;
+            height: 100%;
+        }
+
+        .chart-bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .chart-bar-fill {
+            width: 50px;
+            border-radius: 8px 8px 0 0;
+            transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 8px;
+        }
+
+        .chart-bar-fill.high {
+            background: linear-gradient(180deg, #00e676, #00c9a7);
+        }
+
+        .chart-bar-fill.low {
+            background: linear-gradient(180deg, #ff5252, #ff6b6b);
+        }
+
+        .chart-bar-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .chart-bar-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .activity-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .activity-list::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .activity-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 128, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.85rem;
+        }
+
+        .activity-item .activity-text {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .activity-item .activity-time {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.75rem;
+        }
+
+        .activity-empty {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 30px 0;
+        }
+
+        /* ============================================================ */
+        /* ANALYTICS */
+        /* ============================================================ */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .analytics-card h4 {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 14px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.85rem;
+        }
+
+        .metric-row span:first-child {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .metric-row span:last-child {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .predictor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .predictor-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .predictor-item span {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            min-width: 120px;
+        }
+
+        .predictor-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .predictor-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #0080ff, #00d4ff);
+            transition: width 1s ease;
+        }
+
+        .job-distribution {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 20px;
+        }
+
+        .job-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .job-item span:last-child {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* ============================================================ */
+        /* BULK PREDICT */
+        /* ============================================================ */
+        .bulk-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .bulk-desc {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .file-upload-area {
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            border: 2px dashed rgba(0, 150, 255, 0.2);
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-area:hover {
+            border-color: rgba(0, 150, 255, 0.4);
+            background: rgba(0, 150, 255, 0.04);
+        }
+
+        .file-upload-area.dragover {
+            border-color: #0080ff;
+            background: rgba(0, 128, 255, 0.08);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .file-upload-area p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+
+        .upload-sub {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ============================================================ */
+        /* LEAD PROFILE */
+        /* ============================================================ */
+        .lead-profile-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .lead-search {
+            display: flex;
+            gap: 12px;
+        }
+
+        .lead-search input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: #e0e8f0;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .lead-search input:focus {
+            border-color: #0080ff;
+            box-shadow: 0 0 0 3px rgba(0, 128, 255, 0.15);
+        }
+
+        .lead-search input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #0080ff, #00d4ff);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0, 128, 255, 0.3);
+        }
+
+        .lead-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .lead-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .lead-table th {
+            text-align: left;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .lead-table td {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .lead-table .badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .lead-table .badge.yes {
+            background: rgba(0, 230, 118, 0.15);
+            color: #00e676;
+        }
+
+        .lead-table .badge.no {
+            background: rgba(255, 82, 82, 0.15);
+            color: #ff5252;
+        }
+
+        .lead-table .view-btn {
+            padding: 4px 14px;
+            background: rgba(0, 128, 255, 0.15);
+            border: none;
+            border-radius: 6px;
+            color: #0080ff;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .lead-table .view-btn:hover {
+            background: rgba(0, 128, 255, 0.25);
+        }
+
+        .no-data {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 30px 0;
+        }
+
+        .lead-detail {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .lead-detail h4 {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 12px;
+        }
+
+        .lead-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .lead-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lead-detail-item .label {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .lead-detail-item .value {
+            font-size: 0.95rem;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* ===== BULK ACTIONS ===== */
+        .bulk-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .bulk-actions .search-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .bulk-actions .search-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .delete-btn {
+            padding: 4px 10px;
+            background: rgba(255, 50, 50, 0.15);
+            border: none;
+            border-radius: 6px;
+            color: #ff5252;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 50, 50, 0.3);
+            transform: scale(1.05);
+        }
+
+        .lead-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #0080ff;
+            cursor: pointer;
+        }
+
+        #selectedCount {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+            margin-left: auto;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+        }
+
+        /* ============================================================ */
+        /* AI ASSISTANT */
+        /* ============================================================ */
+        .ai-chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 100%;
+        }
+
+        .ai-lead-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .ai-lead-selector select {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.6)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 12px;
+            padding-right: 36px;
+        }
+
+        .ai-lead-selector select option {
+            background: #1a1f2e;
+            color: #fff;
+        }
+
+        .ai-messages {
+            flex: 1;
+            max-height: 400px;
+            min-height: 200px;
+            overflow-y: auto;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .ai-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .ai-messages::-webkit-scrollbar-thumb {
+            background: rgba(0, 128, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .ai-message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .ai-message .message-avatar {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .ai-message .message-content {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .ai-message .message-content strong {
+            color: #00d4ff;
+        }
+
+        .ai-message.bot .message-content {
+            background: rgba(0, 128, 255, 0.08);
+            border: 1px solid rgba(0, 128, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .ai-message.user .message-content {
+            background: rgba(0, 230, 118, 0.08);
+            border: 1px solid rgba(0, 230, 118, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .ai-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .ai-quick-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ai-quick-actions button {
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .ai-quick-actions button:hover {
+            background: rgba(0, 128, 255, 0.15);
+            color: #fff;
+            border-color: rgba(0, 128, 255, 0.3);
+        }
+
+        .ai-input-area {
+            display: flex;
+            gap: 8px;
+        }
+
+        .ai-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: #e0e8f0;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+            min-width: 0;
+        }
+
+        .ai-input-area input:focus {
+            border-color: #0080ff;
+            box-shadow: 0 0 0 3px rgba(0, 128, 255, 0.15);
+        }
+
+        .ai-input-area input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .ai-input-area .predict-btn {
+            width: auto;
+            padding: 12px 18px;
+            margin: 0;
+            font-size: 0.9rem;
+            border-radius: 10px;
+        }
+
+        .btn-voice {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: #e0e8f0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-voice:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-secondary {
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        .chat-history-toggle {
+            text-align: center;
+            padding: 4px 0;
+        }
+
+        .chat-history-toggle button {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .chat-history-toggle button:hover {
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .chat-history-panel {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 12px;
+        }
+
+        .chat-history-panel::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .chat-history-panel::-webkit-scrollbar-thumb {
+            background: rgba(0, 128, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 2px solid rgba(0, 128, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .history-item .history-question {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .history-item .history-preview {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-item .history-time {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.2);
+            float: right;
+        }
+
+        .history-empty {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.85rem;
+            padding: 20px 0;
+        }
+
+        .ai-status {
+            margin-left: auto;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            background: rgba(0, 230, 118, 0.1);
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ===== TYPING DOTS ===== */
+        .typing-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .typing-dots span {
+            animation: dotPulse 1.4s infinite;
+            font-size: 1.2rem;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dotPulse {
+            0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        /* ===== TOAST ===== */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            margin-top: 32px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.8rem;
+            padding: 20px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ============================================================ */
+        /* AI MODE SELECTOR */
+        /* ============================================================ */
+
+        .ai-mode-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .mode-btn:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, rgba(0, 128, 255, 0.2), rgba(0, 212, 255, 0.1));
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 128, 255, 0.1);
+        }
+
+        .mode-icon {
+            font-size: 1rem;
+        }
+
+        .mode-description {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.3);
+            text-align: center;
+            padding: 4px 0;
+        }
+
+        /* ============================================================ */
+        /* ABOUT PAGE STYLES */
+        /* ============================================================ */
+
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        .about-hero {
+            background: linear-gradient(135deg, rgba(0, 128, 255, 0.08), rgba(0, 212, 255, 0.04));
+            border-radius: 24px;
+            padding: 48px 40px;
+            text-align: center;
+            border: 1px solid rgba(0, 150, 255, 0.1);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(0, 128, 255, 0.03), transparent 70%);
+            animation: pulse-glow 8s ease-in-out infinite;
+        }
+
+        .about-hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            background: rgba(0, 128, 255, 0.15);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0080ff;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .about-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #0080ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .about-tagline {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .about-subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .about-section {
+            margin-bottom: 40px;
+        }
+
+        .about-section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .about-section-icon {
+            font-size: 1.8rem;
+        }
+
+        .about-section-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .about-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 150, 255, 0.08);
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .about-card:hover {
+            border-color: rgba(0, 150, 255, 0.2);
+        }
+
+        .about-card-content {
+            padding: 28px 32px;
+        }
+
+        .about-problem-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .about-problem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .about-problem-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .problem-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .about-problem-item h4 {
+            color: #fff;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .about-problem-item p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .about-importance {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px 20px;
+            background: rgba(0, 230, 118, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 230, 118, 0.1);
+        }
+
+        .importance-icon {
+            font-size: 1.2rem;
+        }
+
+        .about-importance p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .about-importance strong {
+            color: #00e676;
+        }
+
+        .about-solution-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.05rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .about-solution-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .about-solution-item {
+            text-align: center;
+            padding: 20px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s;
+        }
+
+        .about-solution-item:hover {
+            background: rgba(0, 128, 255, 0.05);
+            border-color: rgba(0, 128, 255, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .solution-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .about-solution-item h4 {
+            color: #fff;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .about-solution-item p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        .about-tech-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .about-tech-category {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .tech-category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tech-category-icon {
+            font-size: 1.2rem;
+        }
+
+        .about-tech-category h4 {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tech-tag {
+            padding: 4px 14px;
+            background: rgba(0, 128, 255, 0.08);
+            border-radius: 16px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 128, 255, 0.1);
+        }
+
+        .about-methodology-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .method-step {
+            display: flex;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s;
+        }
+
+        .method-step:hover {
+            background: rgba(0, 128, 255, 0.03);
+            border-color: rgba(0, 128, 255, 0.1);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0080ff, #00d4ff);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .step-content h4 {
+            color: #fff;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .step-content ul {
+            margin: 0;
+            padding-left: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .step-content ul li {
+            margin-bottom: 2px;
+        }
+
+        .about-results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .about-result-card {
+            text-align: center;
+            padding: 24px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-result-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 150, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 128, 255, 0.15);
+        }
+
+        .result-metric {
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            display: block;
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #0080ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-label {
+            display: block;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .about-result-card p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        .about-footer-note {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            margin-top: 20px;
+        }
+
+        .about-footer-note p {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.85rem;
+            margin: 4px 0;
+        }
+
+        .about-version {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* ============================================================ */
+        /* ANIMATIONS */
+        /* ============================================================ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-card .result-active {
+            animation: fadeInUp 0.5s ease;
+        }
+
+        /* ============================================================ */
+        /* RESPONSIVE */
+        /* ============================================================ */
+        @media (max-width: 1100px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .analytics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            .about-solution-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .about-results-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 16px 20px;
+                gap: 12px;
+            }
+            
+            .header-status {
+                justify-content: center;
+            }
+            
+            .tabs {
+                justify-content: center;
+                padding: 4px;
+            }
+            .tab-btn {
+                padding: 8px 14px;
+                font-size: 0.7rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-card {
+                padding: 16px 20px;
+            }
+            .chart-bar-container {
+                gap: 30px;
+            }
+            .chart-bar-fill {
+                width: 35px;
+            }
+            
+            .result-main {
+                grid-template-columns: 1fr;
+            }
+            .result-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .lead-detail-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .job-distribution {
+                grid-template-columns: 1fr;
+            }
+            .predictor-item span {
+                min-width: 80px;
+                font-size: 0.7rem;
+            }
+            
+            .gauge-thumb {
+                width: 34px;
+                height: 34px;
+            }
+            .gauge-value {
+                font-size: 0.6rem;
+            }
+            
+            .confidence-bar {
+                flex-wrap: wrap;
+            }
+            
+            header h1 {
+                font-size: 1.4rem;
+            }
+            .card {
+                padding: 20px;
+            }
+            
+            .ai-messages {
+                max-height: 300px;
+                min-height: 150px;
+            }
+
+            .about-hero {
+                padding: 32px 20px;
+            }
+            .about-hero h1 {
+                font-size: 2.2rem;
+            }
+            .about-tagline {
+                font-size: 1rem;
+            }
+            .about-subtitle {
+                font-size: 0.85rem;
+            }
+            
+            .about-section-header h2 {
+                font-size: 1.2rem;
+            }
+            
+            .about-problem-grid {
+                grid-template-columns: 1fr;
+            }
+            .about-solution-grid {
+                grid-template-columns: 1fr;
+            }
+            .about-tech-grid {
+                grid-template-columns: 1fr;
+            }
+            .about-methodology-grid {
+                grid-template-columns: 1fr;
+            }
+            .about-results-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .about-card-content {
+                padding: 16px 18px;
+            }
+            .about-section {
+                margin-bottom: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .form-group input,
+            .form-group select {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+                height: 42px;
+            }
+            
+            .form-group label {
+                font-size: 0.65rem;
+            }
+            
+            .card {
+                padding: 16px;
+            }
+            
+            .predict-btn {
+                font-size: 0.95rem;
+                padding: 14px;
+            }
+            
+            .header-status {
+                padding: 4px 12px;
+            }
+            .logo-icon {
+                font-size: 1.6rem;
+            }
+            
+            .lead-table td, .lead-table th {
+                padding: 8px 10px;
+                font-size: 0.7rem;
+            }
+            
+            .bulk-actions {
+                gap: 8px;
+            }
+            .bulk-actions .search-btn {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+            }
+            
+            .ai-lead-selector select {
+                min-width: 100%;
+                width: 100%;
+            }
+            
+            .ai-messages {
+                max-height: 250px;
+                min-height: 120px;
+                padding: 10px;
+            }
+
+            .about-hero h1 {
+                font-size: 1.8rem;
+            }
+            .about-results-grid {
+                grid-template-columns: 1fr;
+            }
+            .method-step {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Glow Effects -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🎯</div>
+                <div>
+                    <h1>LeadScout</h1>
+                    <span class="logo-sub">Smart Lead Prioritization</span>
+                </div>
+            </div>
+            <div class="header-status">
+                <span class="status-dot"></span>
+                <span class="status-text">System Online</span>
+                <span style="margin:0 8px;color:rgba(255,255,255,0.2);">|</span>
+                <span class="header-user">LeadScout</span>
+                <a href="{{ url_for('home') }}" class="header-logout">🏠 Home</a>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="predict">
+                <span class="tab-icon">🔮</span> Predict
+            </button>
+            <button class="tab-btn" data-tab="dashboard">
+                <span class="tab-icon">📊</span> Dashboard
+            </button>
+            <button class="tab-btn" data-tab="analytics">
+                <span class="tab-icon">📈</span> Analytics
+            </button>
+            <button class="tab-btn" data-tab="bulk">
+                <span class="tab-icon">📁</span> Bulk Predict
+            </button>
+            <button class="tab-btn" data-tab="leads">
+                <span class="tab-icon">👤</span> Lead Profile
+            </button>
+            <button class="tab-btn" data-tab="about">
+                <span class="tab-icon">ℹ️</span> About
+            </button>
+            <button class="tab-btn" data-tab="ai">
+                <span class="tab-icon">🤖</span> AI Assistant
+            </button>
+        </nav>
+
+        <!-- ============================================================ -->
+        <!-- TAB 1: PREDICT -->
+        <!-- ============================================================ -->
+        <div class="tab-content active" id="tab-predict">
+            <div class="main-grid">
+                <!-- Form Card -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <span class="card-icon">📋</span>
+                        <h2>Client Information</h2>
+                    </div>
+
+                    <form id="predictionForm" novalidate>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="age">Age</label>
+                                <input type="number" id="age" value="35" min="18" max="100" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="job">Job</label>
+                                <select id="job">
+                                    <option value="admin.">Admin.</option>
+                                    <option value="blue-collar">Blue-collar</option>
+                                    <option value="entrepreneur">Entrepreneur</option>
+                                    <option value="housemaid">Housemaid</option>
+                                    <option value="management" selected>Management</option>
+                                    <option value="retired">Retired</option>
+                                    <option value="self-employed">Self-employed</option>
+                                    <option value="services">Services</option>
+                                    <option value="student">Student</option>
+                                    <option value="technician">Technician</option>
+                                    <option value="unemployed">Unemployed</option>
+                                    <option value="unknown">Unknown</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="marital">Marital Status</label>
+                                <select id="marital">
+                                    <option value="married" selected>Married</option>
+                                    <option value="single">Single</option>
+                                    <option value="divorced">Divorced</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="education">Education</label>
+                                <select id="education">
+                                    <option value="secondary">Secondary</option>
+                                    <option value="tertiary" selected>Tertiary</option>
+                                    <option value="primary">Primary</option>
+                                    <option value="unknown">Unknown</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="balance">Balance ($)</label>
+                                <input type="number" id="balance" value="1500" step="100" />
+                            </div>
+                            <div class="form-group">
+                                <label for="default">Default</label>
+                                <select id="default">
+                                    <option value="no" selected>No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact">Contact Type</label>
+                                <select id="contact">
+                                    <option value="cellular" selected>Cellular</option>
+                                    <option value="telephone">Telephone</option>
+                                    <option value="unknown">Unknown</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="month">Month</label>
+                                <select id="month">
+                                    <option value="jan">Jan</option>
+                                    <option value="feb">Feb</option>
+                                    <option value="mar">Mar</option>
+                                    <option value="apr">Apr</option>
+                                    <option value="may" selected>May</option>
+                                    <option value="jun">Jun</option>
+                                    <option value="jul">Jul</option>
+                                    <option value="aug">Aug</option>
+                                    <option value="sep">Sep</option>
+                                    <option value="oct">Oct</option>
+                                    <option value="nov">Nov</option>
+                                    <option value="dec">Dec</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="day">Day</label>
+                                <input type="number" id="day" value="15" min="1" max="31" />
+                            </div>
+                            <div class="form-group">
+                                <label for="duration">Call Duration (sec)</label>
+                                <input type="number" id="duration" value="200" step="10" />
+                            </div>
+                            <div class="form-group">
+                                <label for="campaign">Campaign Attempts</label>
+                                <input type="number" id="campaign" value="2" min="1" max="63" />
+                            </div>
+                            <div class="form-group">
+                                <label for="pdays">Last Contact Days</label>
+                                <input type="number" id="pdays" value="-1" step="1" />
+                                <small>(-1 = Never contacted)</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="previous">Previous Contacts</label>
+                                <input type="number" id="previous" value="1" min="0" />
+                            </div>
+                            <div class="form-group">
+                                <label for="poutcome">Previous Outcome</label>
+                                <select id="poutcome">
+                                    <option value="unknown">Unknown</option>
+                                    <option value="other">Other</option>
+                                    <option value="failure">Failure</option>
+                                    <option value="success" selected>Success</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="housing">Housing Loan</label>
+                                <select id="housing">
+                                    <option value="no">No</option>
+                                    <option value="yes" selected>Yes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="loan">Personal Loan</label>
+                                <select id="loan">
+                                    <option value="no" selected>No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="predict-btn" id="predictBtn">
+                            <span class="btn-icon">🔮</span>
+                            <span class="btn-text">Predict</span>
+                            <span class="btn-shimmer"></span>
+                        </button>
+                    </form>
+
+                    <div id="validationMessage" class="validation-message" style="display:none;">
+                        ⚠️ Please fill in all required fields before predicting.
+                    </div>
+                </div>
+
+                <!-- Results Card -->
+                <div class="card results-card" id="resultsCard">
+                    <div class="card-header">
+                        <span class="card-icon">📊</span>
+                        <h2>Prediction Result</h2>
+                    </div>
+
+                    <div class="results-content" id="resultsContent">
+                        <div class="result-empty" id="resultEmpty">
+                            <div class="empty-icon">🔮</div>
+                            <h3>Ready to Predict</h3>
+                            <p>Fill in the client details and click <strong>Predict</strong> to see the result.</p>
+                        </div>
+
+                        <div class="result-active" id="resultActive" style="display:none;">
+                            <div class="result-main">
+                                <div class="result-prediction">
+                                    <span class="result-label">Prediction</span>
+                                    <span class="result-value" id="predictionValue">—</span>
+                                </div>
+                                <div class="result-recommendation">
+                                    <span class="result-label">Recommendation</span>
+                                    <span class="result-value" id="recommendationValue">—</span>
+                                </div>
+                            </div>
+
+                            <div class="gauge-container">
+                                <div class="gauge-labels">
+                                    <span>Low</span>
+                                    <span>Medium</span>
+                                    <span>High</span>
+                                </div>
+                                <div class="gauge-track">
+                                    <div class="gauge-fill" id="gaugeFill" style="width: 0%;"></div>
+                                    <div class="gauge-thumb" id="gaugeThumb" style="left: 0%;">
+                                        <span class="gauge-value" id="gaugeValue">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="result-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Probability of Yes</span>
+                                    <span class="detail-value" id="probYes">0%</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Probability of No</span>
+                                    <span class="detail-value" id="probNo">0%</span>
+                                </div>
+                            </div>
+
+                            <div class="result-message" id="resultMessage">
+                                <p>📝 Enter client details and click Predict</p>
+                            </div>
+
+                            <div class="confidence-bar">
+                                <span class="confidence-label">Confidence</span>
+                                <div class="confidence-track">
+                                    <div class="confidence-fill" id="confidenceFill" style="width: 0%;"></div>
+                                </div>
+                                <span class="confidence-value" id="confidenceValue">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 2: DASHBOARD -->
+        <!-- ============================================================ -->
+        <div class="tab-content" id="tab-dashboard" style="display:none;">
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Predictions</span>
+                        <span class="stat-value" id="totalPredictions">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <span class="stat-label">High Potential Leads</span>
+                        <span class="stat-value" id="highPotential">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Low Priority Leads</span>
+                        <span class="stat-value" id="lowPriority">0</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Conversion Rate</span>
+                        <span class="stat-value" id="conversionRate">0%</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Model Accuracy</span>
+                        <span class="stat-value" id="modelAccuracy">81.2%</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🕐</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Last Prediction</span>
+                        <span class="stat-value" id="lastPrediction" style="font-size:0.9rem;">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="card chart-card">
+                    <h3>Prediction Distribution</h3>
+                    <div class="chart-container">
+                        <div class="chart-bar-container" id="distributionChart">
+                            <div class="chart-bar-item">
+                                <div class="chart-bar-fill high" id="chartHigh" style="height:0%;"></div>
+                                <span class="chart-bar-label">High</span>
+                                <span class="chart-bar-value" id="chartHighValue">0</span>
+                            </div>
+                            <div class="chart-bar-item">
+                                <div class="chart-bar-fill low" id="chartLow" style="height:0%;"></div>
+                                <span class="chart-bar-label">Low</span>
+                                <span class="chart-bar-value" id="chartLowValue">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <h3>Recent Activity</h3>
+                    <div class="activity-list" id="activityList">
+                        <p class="activity-empty">No recent activity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 3: ANALYTICS -->
+        <!-- ============================================================ -->
+        <div class="tab-content" id="tab-analytics" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📈</span>
+                    <h2>Analytics & Insights</h2>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h4>📊 Key Metrics</h4>
+                        <div class="metric-row">
+                            <span>Total Predictions</span>
+                            <span id="analyticsTotal">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>High Potential Rate</span>
+                            <span id="analyticsHighRate">0%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Model Confidence</span>
+                            <span id="analyticsConfidence">0%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Average Probability</span>
+                            <span id="analyticsAvgProb">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h4>🎯 Top Predictors</h4>
+                        <div class="predictor-list">
+                            <div class="predictor-item">
+                                <span>Previous Success</span>
+                                <div class="predictor-bar"><div class="predictor-fill" style="width:95%;"></div></div>
+                            </div>
+                            <div class="predictor-item">
+                                <span>Call Duration</span>
+                                <div class="predictor-bar"><div class="predictor-fill" style="width:78%;"></div></div>
+                            </div>
+                            <div class="predictor-item">
+                                <span>Job Type</span>
+                                <div class="predictor-bar"><div class="predictor-fill" style="width:62%;"></div></div>
+                            </div>
+                            <div class="predictor-item">
+                                <span>Balance</span>
+                                <div class="predictor-bar"><div class="predictor-fill" style="width:55%;"></div></div>
+                            </div>
+                            <div class="predictor-item">
+                                <span>Education</span>
+                                <div class="predictor-bar"><div class="predictor-fill" style="width:48%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h4>📋 Job Distribution</h4>
+                        <div class="job-distribution" id="jobDistribution">
+                            <div class="job-item"><span>Management</span><span id="jobMgmt">0</span></div>
+                            <div class="job-item"><span>Blue-collar</span><span id="jobBlue">0</span></div>
+                            <div class="job-item"><span>Technician</span><span id="jobTech">0</span></div>
+                            <div class="job-item"><span>Services</span><span id="jobServices">0</span></div>
+                            <div class="job-item"><span>Retired</span><span id="jobRetired">0</span></div>
+                            <div class="job-item"><span>Other</span><span id="jobOther">0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 4: BULK PREDICT -->
+        <!-- ============================================================ -->
+        <div class="tab-content" id="tab-bulk" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">📁</span>
+                    <h2>Bulk Predict</h2>
+                </div>
+
+                <div class="bulk-content">
+                    <p class="bulk-desc">Upload a CSV file with client data to predict multiple leads at once.</p>
+
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <span class="upload-icon">📤</span>
+                        <p>Drag & drop your CSV file here</p>
+                        <span class="upload-sub">or click to browse</span>
+                        <input type="file" id="fileInput" accept=".csv" style="display:none;" />
+                    </div>
+
+                    <button class="predict-btn" id="bulkPredictBtn" style="display:none;">
+                        <span class="btn-icon">🚀</span>
+                        <span class="btn-text">Predict All</span>
+                    </button>
+
+                    <div id="bulkResults"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 5: LEAD PROFILE -->
+        <!-- ============================================================ -->
+        <div class="tab-content" id="tab-leads" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">👤</span>
+                    <h2>Lead Profile</h2>
+                </div>
+
+                <div class="lead-profile-content">
+                    <div class="lead-search">
+                        <input type="text" id="leadSearch" placeholder="Search by job, education, or ID..." />
+                        <button id="leadSearchBtn" class="search-btn">🔍 Search</button>
+                    </div>
+
+                    <div class="lead-table-container">
+                        <table class="lead-table" id="leadTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:30px;">
+                                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleAllCheckboxes(this)" />
+                                    </th>
+                                    <th>#</th>
+                                    <th>Job</th>
+                                    <th>Age</th>
+                                    <th>Balance</th>
+                                    <th>Prediction</th>
+                                    <th>Confidence</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadTableBody">
+                                <tr>
+                                    <td colspan="8" class="no-data">No leads yet. Start predicting to build your lead list.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="lead-detail" id="leadDetail" style="display:none;">
+                        <h4>📋 Lead Details</h4>
+                        <div id="leadDetailContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 6: ABOUT -->
+        <!-- ============================================================ -->
+        <div class="tab-content" id="tab-about" style="display:none;">
+            <div class="about-container">
+                <div class="about-hero">
+                    <div class="about-hero-content">
+                        <span class="about-badge">🚀 System Overview</span>
+                        <h1>LeadScout</h1>
+                        <p class="about-tagline">Smart Lead Prioritization for Bank Telemarketing Campaigns</p>
+                        <p class="about-subtitle">Leveraging Machine Learning to identify high-potential customers and optimize campaign ROI</p>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <div class="about-section-header">
+                        <span class="about-section-icon">🎯</span>
+                        <h2>Problem Statement</h2>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-content">
+                            <p class="about-problem-text">
+                                Our marketing team is spending too much time and money calling clients who are unlikely to buy a term deposit.
+                                The current "one-size-fits-all" approach results in:
+                            </p>
+                            <div class="about-problem-grid">
+                                <div class="about-problem-item">
+                                    <span class="problem-icon">💰</span>
+                                    <div>
+                                        <h4>High Cost</h4>
+                                        <p>Wasted resources on low-potential leads</p>
+                                    </div>
+                                </div>
+                                <div class="about-problem-item">
+                                    <span class="problem-icon">⏰</span>
+                                    <div>
+                                        <h4>Time Inefficiency</h4>
+                                        <p>Sales team spends hours on unproductive calls</p>
+                                    </div>
+                                </div>
+                                <div class="about-problem-item">
+                                    <span class="problem-icon">📉</span>
+                                    <div>
+                                        <h4>Low Conversion</h4>
+                                        <p>Typical conversion rate below 5%</p>
+                                    </div>
+                                </div>
+                                <div class="about-problem-item">
+                                    <span class="problem-icon">😤</span>
+                                    <div>
+                                        <h4>Customer Frustration</h4>
+                                        <p>Irrelevant calls annoy potential customers</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="about-importance">
+                                <span class="importance-icon">⚡</span>
+                                <p><strong>Why this matters:</strong> Every wasted call costs money and damages customer relationships. A data-driven approach can increase conversion rates by up to 80% while reducing call volume by 70%.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <div class="about-section-header">
+                        <span class="about-section-icon">💡</span>
+                        <h2>Project Overview / Solution</h2>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-content">
+                            <p class="about-solution-text">
+                                LeadScout is a machine learning-powered lead prioritization system that predicts which clients are most likely to subscribe to a term deposit.
+                            </p>
+                            <div class="about-solution-grid">
+                                <div class="about-solution-item">
+                                    <div class="solution-icon">🤖</div>
+                                    <h4>Predictive Intelligence</h4>
+                                    <p>Uses historical campaign data to predict subscription likelihood</p>
+                                </div>
+                                <div class="about-solution-item">
+                                    <div class="solution-icon">🎯</div>
+                                    <h4>Smart Prioritization</h4>
+                                    <p>Ranks leads by probability, enabling focused sales efforts</p>
+                                </div>
+                                <div class="about-solution-item">
+                                    <div class="solution-icon">📊</div>
+                                    <h4>Real-time Dashboard</h4>
+                                    <p>Visual insights into campaign performance and lead quality</p>
+                                </div>
+                                <div class="about-solution-item">
+                                    <div class="solution-icon">📁</div>
+                                    <h4>Bulk Processing</h4>
+                                    <p>Analyze thousands of leads at once with CSV upload</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <div class="about-section-header">
+                        <span class="about-section-icon">🛠️</span>
+                        <h2>Tools & Technologies</h2>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-content">
+                            <div class="about-tech-grid">
+                                <div class="about-tech-category">
+                                    <div class="tech-category-header">
+                                        <span class="tech-category-icon">🐍</span>
+                                        <h4>Programming Languages</h4>
+                                    </div>
+                                    <div class="tech-tags">
+                                        <span class="tech-tag">Python 3.9</span>
+                                        <span class="tech-tag">JavaScript</span>
+                                        <span class="tech-tag">HTML5</span>
+                                        <span class="tech-tag">CSS3</span>
+                                    </div>
+                                </div>
+                                <div class="about-tech-category">
+                                    <div class="tech-category-header">
+                                        <span class="tech-category-icon">📚</span>
+                                        <h4>Libraries & Frameworks</h4>
+                                    </div>
+                                    <div class="tech-tags">
+                                        <span class="tech-tag">Flask</span>
+                                        <span class="tech-tag">Pandas</span>
+                                        <span class="tech-tag">NumPy</span>
+                                        <span class="tech-tag">Scikit-learn</span>
+                                        <span class="tech-tag">Joblib</span>
+                                        <span class="tech-tag">SQLite3</span>
+                                    </div>
+                                </div>
+                                <div class="about-tech-category">
+                                    <div class="tech-category-header">
+                                        <span class="tech-category-icon">📊</span>
+                                        <h4>Machine Learning</h4>
+                                    </div>
+                                    <div class="tech-tags">
+                                        <span class="tech-tag">Logistic Regression</span>
+                                        <span class="tech-tag">SMOTE</span>
+                                        <span class="tech-tag">StandardScaler</span>
+                                        <span class="tech-tag">OneHotEncoder</span>
+                                    </div>
+                                </div>
+                                <div class="about-tech-category">
+                                    <div class="tech-category-header">
+                                        <span class="tech-category-icon">🚀</span>
+                                        <h4>Deployment</h4>
+                                    </div>
+                                    <div class="tech-tags">
+                                        <span class="tech-tag">Flask Server</span>
+                                        <span class="tech-tag">SQLite</span>
+                                        <span class="tech-tag">PythonAnywhere</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <div class="about-section-header">
+                        <span class="about-section-icon">⚙️</span>
+                        <h2>Methodology & Implementation</h2>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-content">
+                            <div class="about-methodology-grid">
+                                <div class="method-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h4>Data Understanding & Preparation</h4>
+                                        <ul>
+                                            <li>Loaded Bank Marketing Dataset (45,000+ records)</li>
+                                            <li>Performed exploratory data analysis (EDA)</li>
+                                            <li>Handled missing values and outliers</li>
+                                            <li>Analyzed feature distributions and correlations</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="method-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h4>Data Preprocessing</h4>
+                                        <ul>
+                                            <li>One-hot encoding for categorical variables</li>
+                                            <li>Standard scaling for numerical features</li>
+                                            <li>Train-test split (70/30)</li>
+                                            <li>SMOTE for handling class imbalance</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="method-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h4>Model Building</h4>
+                                        <ul>
+                                            <li>Logistic Regression classifier</li>
+                                            <li>Cross-validation for hyperparameter tuning</li>
+                                            <li>Feature importance analysis</li>
+                                            <li>Model persistence with Joblib</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="method-step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h4>Web Application Development</h4>
+                                        <ul>
+                                            <li>Flask backend with RESTful API</li>
+                                            <li>SQLite database for lead storage</li>
+                                            <li>Interactive frontend with real-time predictions</li>
+                                            <li>Dashboard with analytics and visualizations</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <div class="about-section-header">
+                        <span class="about-section-icon">📈</span>
+                        <h2>Results & Demo</h2>
+                    </div>
+                    <div class="about-card">
+                        <div class="about-card-content">
+                            <div class="about-results-grid">
+                                <div class="about-result-card">
+                                    <div class="result-metric">
+                                        <span class="metric-value">81.2%</span>
+                                        <span class="metric-label">Accuracy</span>
+                                    </div>
+                                    <p>Overall model correctness on test data</p>
+                                </div>
+                                <div class="about-result-card">
+                                    <div class="result-metric">
+                                        <span class="metric-value">0.81</span>
+                                        <span class="metric-label">Precision</span>
+                                    </div>
+                                    <p>When model says "Yes", it's correct 81% of the time</p>
+                                </div>
+                                <div class="about-result-card">
+                                    <div class="result-metric">
+                                        <span class="metric-value">0.80</span>
+                                        <span class="metric-label">Recall</span>
+                                    </div>
+                                    <p>Identifies 80% of all actual subscribers</p>
+                                </div>
+                                <div class="about-result-card">
+                                    <div class="result-metric">
+                                        <span class="metric-value">0.80</span>
+                                        <span class="metric-label">F1-Score</span>
+                                    </div>
+                                    <p>Excellent balance of precision and recall</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-footer-note">
+                    <p>Built with ❤️ using Python, Flask, and Machine Learning</p>
+                    <p class="about-version">LeadScout v3.0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TAB 7: AI ASSISTANT (GENERAL ONLY) -->
+        <!-- ============================================================ -->
+        <div class="tab-content" id="tab-ai" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🤖</span>
+                    <h2>AI Campaign Analyst</h2>
+                    <span class="ai-status" id="aiStatus">🔄 Checking...</span>
+                </div>
+
+                <div class="ai-chat-container">
+                    <!-- Mode Description -->
+                    <div style="padding: 8px 0; text-align: center;">
+                        <span style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">
+                            📊 Ask questions about your leads, trends, and campaign performance
+                        </span>
+                    </div>
+
+                    <!-- Messages Area -->
+                    <div class="ai-messages" id="aiMessages">
+                        <div class="ai-message bot">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p><strong>Hello! I'm your AI Campaign Analyst.</strong></p>
+                                <p>I can help you with:</p>
+                                <ul>
+                                    <li>📈 Overall campaign performance</li>
+                                    <li>🎯 Lead trends and patterns</li>
+                                    <li>💡 Strategic recommendations</li>
+                                    <li>📊 Data insights</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: rgba(255,255,255,0.5); font-size: 0.85rem;">
+                                    💡 Try asking: "What are my top performing lead types?" or "Show me conversion trends"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="ai-quick-actions">
+                        <button onclick="quickAsk('summary')">📊 Overview</button>
+                        <button onclick="quickAsk('trends')">📈 Trends</button>
+                        <button onclick="quickAsk('top performers')">⭐ Top Performers</button>
+                        <button onclick="quickAsk('recommendations')">💡 Recommendations</button>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="ai-input-area">
+                        <input type="text" id="aiQuestion" placeholder="Ask about your campaign data..." />
+                        <button onclick="askAI()" class="predict-btn" id="aiAskBtn">
+                            <span class="btn-icon">➤</span>
+                        </button>
+                    </div>
+
+                    <!-- Chat History Toggle -->
+                    <div class="chat-history-toggle">
+                        <button onclick="toggleHistory()" class="btn-secondary">
+                            📜 Chat History (<span id="historyCount">0</span>)
+                        </button>
+                    </div>
+
+                    <!-- History Panel -->
+                    <div class="chat-history-panel" id="historyPanel" style="display:none;">
+                        <div id="historyList" class="history-list">
+                            <p class="history-empty">No chat history yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Footer -->
+        <footer>
+            <p>Powered by Machine Learning · LeadScout v3.0</p>
+        </footer>
+    </div>
+
+   <script>
+    // ============================================================
+    // LEAD SCOUT - MAIN APPLICATION JAVASCRIPT
+    // ============================================================
+
+    console.log("🚀 LeadScout UI loaded successfully!");
+
+    // ===== DOM Elements =====
+    const form = document.getElementById('predictionForm');
+    const resultsCard = document.getElementById('resultsCard');
+    const resultEmpty = document.getElementById('resultEmpty');
+    const resultActive = document.getElementById('resultActive');
+    const validationMsg = document.getElementById('validationMessage');
+
+    const predictionValue = document.getElementById('predictionValue');
+    const recommendationValue = document.getElementById('recommendationValue');
+    const gaugeFill = document.getElementById('gaugeFill');
+    const gaugeThumb = document.getElementById('gaugeThumb');
+    const gaugeValue = document.getElementById('gaugeValue');
+    const probNo = document.getElementById('probNo');
+    const probYes = document.getElementById('probYes');
+    const resultMessage = document.getElementById('resultMessage');
+    const confidenceFill = document.getElementById('confidenceFill');
+    const confidenceValue = document.getElementById('confidenceValue');
+
+    // ===== Data Stores =====
+    let historyData = [];
+    let leadData = [];
+    let predictionCount = 0;
+
+    // ============================================================
+    // LOAD LEADS FROM DATABASE - PERSISTENCE
+    // ============================================================
+
+    async function loadLeadsFromDB() {
+        console.log('🔄 Loading leads from database...');
+        
+        try {
+            const response = await fetch('/leads?limit=1000');
+            
+            if (!response.ok) {
+                console.error('❌ Failed to fetch leads:', response.status);
+                return;
+            }
+            
+            const data = await response.json();
+            console.log('📊 Database response:', data);
+            
+            if (data.status === 'success' && data.leads && data.leads.length > 0) {
+                console.log(`✅ Found ${data.leads.length} leads in database`);
+                
+                // Clear existing data
+                historyData = [];
+                leadData = [];
+                predictionCount = 0;
+                
+                data.leads.forEach(lead => {
+                    try {
+                        const entry = {
+                            id: lead.id,
+                            display_id: lead.display_id || lead.id,
+                            client: lead.client_data,
+                            result: {
+                                prediction: lead.prediction,
+                                probability_yes: lead.probability_yes,
+                                probability_no: lead.probability_no
+                            },
+                            timestamp: new Date(lead.timestamp).toLocaleString(),
+                            confidence: lead.confidence,
+                            priority: lead.priority,
+                            message: lead.message,
+                            source: lead.source
+                        };
+                        
+                        historyData.push(entry);
+                        leadData.push({
+                            id: lead.id,
+                            display_id: lead.display_id || lead.id,
+                            job: lead.client_data.job || 'unknown',
+                            age: lead.client_data.age || 0,
+                            balance: lead.client_data.balance || 0,
+                            education: lead.client_data.education || 'unknown',
+                            prediction: lead.prediction,
+                            confidence: lead.confidence,
+                            data: lead.client_data,
+                            result: entry.result,
+                            timestamp: entry.timestamp,
+                            source: lead.source
+                        });
+                        predictionCount++;
+                    } catch (e) {
+                        console.warn('⚠️ Error processing lead:', e);
+                    }
+                });
+                
+                console.log(`✅ Loaded ${historyData.length} leads into memory`);
+                
+                // Update all UI components
+                renderHistory();
+                updateDashboard();
+                updateAnalytics();
+                renderLeadTable();
+                
+            } else {
+                console.log('📭 No leads found in database');
+                renderHistory();
+                updateDashboard();
+                updateAnalytics();
+                renderLeadTable();
+            }
+        } catch (error) {
+            console.error('❌ Error loading leads:', error);
+        }
+    }
+
+    // ============================================================
+    // TAB SWITCHING
+    // ============================================================
+
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = {
+        predict: document.getElementById('tab-predict'),
+        dashboard: document.getElementById('tab-dashboard'),
+        analytics: document.getElementById('tab-analytics'),
+        bulk: document.getElementById('tab-bulk'),
+        leads: document.getElementById('tab-leads'),
+        about: document.getElementById('tab-about'),
+        ai: document.getElementById('tab-ai')
+    };
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const tabId = btn.dataset.tab;
+            Object.keys(tabContents).forEach(key => {
+                if (tabContents[key]) {
+                    tabContents[key].style.display = key === tabId ? 'block' : 'none';
+                }
+            });
+
+            if (tabId === 'dashboard') updateDashboard();
+            if (tabId === 'analytics') updateAnalytics();
+            if (tabId === 'leads') renderLeadTable();
+            if (tabId === 'ai') loadLeadsDropdown();
+        });
+    });
+
+    // ============================================================
+    // VALIDATION
+    // ============================================================
+
+    function validateForm() {
+        const required = ['age', 'balance', 'day', 'duration', 'campaign', 'pdays', 'previous'];
+        let allFilled = true;
+
+        required.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && (!el.value || el.value === '')) {
+                allFilled = false;
+                el.style.borderColor = 'rgba(255,50,50,0.6)';
+            } else if (el) {
+                el.style.borderColor = '';
+            }
+        });
+
+        return allFilled;
+    }
+
+    // ============================================================
+    // FORM SUBMIT
+    // ============================================================
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        validationMsg.style.display = 'none';
+
+        if (!validateForm()) {
+            validationMsg.style.display = 'block';
+            validationMsg.textContent = '⚠️ Please fill in all required fields before predicting.';
+            return;
+        }
+
+        const submitBtn = document.getElementById('predictBtn');
+        const originalHTML = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="loading"></span> Analyzing...';
+        submitBtn.disabled = true;
+
+        try {
+            const clientData = {
+                age: parseInt(document.getElementById('age').value),
+                job: document.getElementById('job').value,
+                marital: document.getElementById('marital').value,
+                education: document.getElementById('education').value,
+                default: document.getElementById('default').value,
+                balance: parseFloat(document.getElementById('balance').value),
+                housing: document.getElementById('housing').value,
+                loan: document.getElementById('loan').value,
+                contact: document.getElementById('contact').value,
+                day: parseInt(document.getElementById('day').value),
+                month: document.getElementById('month').value,
+                duration: parseInt(document.getElementById('duration').value),
+                campaign: parseInt(document.getElementById('campaign').value),
+                pdays: parseInt(document.getElementById('pdays').value),
+                previous: parseInt(document.getElementById('previous').value),
+                poutcome: document.getElementById('poutcome').value
+            };
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(clientData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                displayResults(result, clientData);
+                // Reload leads after prediction
+                await loadLeadsFromDB();
+            } else {
+                showError(result.error || 'Something went wrong.');
+            }
+
+        } catch (error) {
+            showError('Network error. Check if server is running.');
+        } finally {
+            submitBtn.innerHTML = originalHTML;
+            submitBtn.disabled = false;
+        }
+    });
+
+    // ============================================================
+    // DISPLAY RESULTS
+    // ============================================================
+
+    function displayResults(result, clientData) {
+        resultEmpty.style.display = 'none';
+        resultActive.style.display = 'flex';
+
+        const isYes = result.prediction === 'Yes';
+
+        predictionValue.textContent = result.prediction;
+        predictionValue.className = 'result-value ' + (isYes ? 'yes' : 'no');
+
+        const isHigh = result.recommendation === 'High Priority';
+        recommendationValue.textContent = result.recommendation;
+        recommendationValue.className = 'result-value ' + (isHigh ? 'high' : 'low');
+
+        const yesProb = Math.round(result.probability_yes);
+        const noProb = Math.round(result.probability_no);
+
+        gaugeFill.style.width = yesProb + '%';
+        gaugeThumb.style.left = yesProb + '%';
+        gaugeValue.textContent = yesProb + '%';
+
+        probYes.textContent = yesProb + '%';
+        probNo.textContent = noProb + '%';
+
+        const message = result.message || (isYes ? '🎯 Call this client!' : '⏳ Skip this client');
+        resultMessage.innerHTML = `<p>${message}</p>`;
+        resultMessage.className = 'result-message ' + (isYes ? 'success' : 'fail');
+
+        const confidence = Math.min(Math.round(Math.abs(yesProb - 50) * 2), 95);
+        confidenceFill.style.width = confidence + '%';
+        confidenceValue.textContent = confidence + '%';
+
+        resultActive.style.animation = 'none';
+        setTimeout(() => {
+            resultActive.style.animation = 'fadeInUp 0.5s ease';
+        }, 10);
+
+        if (clientData) {
+            addToHistory(clientData, result);
+        }
+        
+        if (result.id) {
+            fetchLeadScore(result.id);
+        }
+    }
+
+    // ============================================================
+    // SHOW ERROR
+    // ============================================================
+
+    function showError(message) {
+        resultEmpty.style.display = 'none';
+        resultActive.style.display = 'flex';
+
+        predictionValue.textContent = 'Error';
+        predictionValue.className = 'result-value no';
+        recommendationValue.textContent = '—';
+        recommendationValue.className = 'result-value';
+
+        gaugeFill.style.width = '0%';
+        gaugeThumb.style.left = '0%';
+        gaugeValue.textContent = '0%';
+        probYes.textContent = '0%';
+        probNo.textContent = '0%';
+
+        resultMessage.innerHTML = `<p>⚠️ ${message}</p>`;
+        resultMessage.className = 'result-message fail';
+
+        confidenceFill.style.width = '0%';
+        confidenceValue.textContent = '0%';
+    }
+
+    // ============================================================
+    // HISTORY
+    // ============================================================
+
+    function addToHistory(client, result) {
+        const entry = {
+            id: result.id || Date.now(),
+            display_id: result.display_id || historyData.length + 1,
+            client: client,
+            result: result,
+            timestamp: new Date().toLocaleString(),
+            confidence: Math.min(Math.round(Math.abs(result.probability_yes - 50) * 2), 95)
+        };
+        
+        // Check if already exists
+        const exists = historyData.some(h => h.id === entry.id);
+        if (!exists) {
+            historyData.unshift(entry);
+            leadData.unshift({
+                id: entry.id,
+                display_id: entry.display_id,
+                job: client.job,
+                age: client.age,
+                balance: client.balance,
+                education: client.education,
+                prediction: result.prediction,
+                confidence: entry.confidence,
+                data: client,
+                result: result,
+                timestamp: entry.timestamp
+            });
+            predictionCount++;
+        }
+
+        renderHistory();
+        updateDashboard();
+        updateAnalytics();
+        renderLeadTable();
+    }
+
+    function renderHistory() {
+        const container = document.getElementById('historyList');
+        if (!container) return;
+
+        if (historyData.length === 0) {
+            container.innerHTML = '<p class="history-empty">No predictions yet.</p>';
+            return;
+        }
+
+        container.innerHTML = historyData.slice(0, 20).map(item => `
+            <div class="history-item">
+                <div class="history-info">
+                    <span class="history-name">${item.client.job} · ${item.client.age} yrs</span>
+                    <span class="history-detail">$${item.client.balance} · ${item.client.education}</span>
+                </div>
+                <div class="history-result">
+                    <span class="history-badge ${item.result.prediction.toLowerCase()}">${item.result.prediction}</span>
+                    <span class="history-time">${item.timestamp}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ============================================================
+    // DASHBOARD
+    // ============================================================
+
+    function updateDashboard() {
+        const total = historyData.length;
+        const high = historyData.filter(h => h.result.prediction === 'Yes').length;
+        const low = total - high;
+        const rate = total > 0 ? Math.round((high / total) * 100) : 0;
+
+        document.getElementById('totalPredictions').textContent = total;
+        document.getElementById('highPotential').textContent = high;
+        document.getElementById('lowPriority').textContent = low;
+        document.getElementById('conversionRate').textContent = rate + '%';
+        document.getElementById('lastPrediction').textContent = total > 0 ? historyData[0].timestamp : '—';
+
+        const maxVal = Math.max(high, low, 1);
+        document.getElementById('chartHigh').style.height = Math.max((high / maxVal) * 80, 10) + '%';
+        document.getElementById('chartLow').style.height = Math.max((low / maxVal) * 80, 10) + '%';
+        document.getElementById('chartHighValue').textContent = high;
+        document.getElementById('chartLowValue').textContent = low;
+
+        const activityList = document.getElementById('activityList');
+        if (historyData.length === 0) {
+            activityList.innerHTML = '<p class="activity-empty">No recent activity</p>';
+        } else {
+            activityList.innerHTML = historyData.slice(0, 5).map(item => `
+                <div class="activity-item">
+                    <span class="activity-text">${item.client.job} · ${item.result.prediction}</span>
+                    <span class="activity-time">${item.timestamp}</span>
+                </div>
+            `).join('');
+        }
+    }
+
+    // ============================================================
+    // ANALYTICS
+    // ============================================================
+
+    function updateAnalytics() {
+        const total = historyData.length;
+        const high = historyData.filter(h => h.result.prediction === 'Yes').length;
+        const rate = total > 0 ? Math.round((high / total) * 100) : 0;
+        const avgProb = total > 0 ? Math.round(historyData.reduce((sum, h) => sum + h.result.probability_yes, 0) / total) : 0;
+        const avgConf = total > 0 ? Math.round(historyData.reduce((sum, h) => sum + (h.confidence || 50), 0) / total) : 0;
+
+        document.getElementById('analyticsTotal').textContent = total;
+        document.getElementById('analyticsHighRate').textContent = rate + '%';
+        document.getElementById('analyticsConfidence').textContent = avgConf + '%';
+        document.getElementById('analyticsAvgProb').textContent = avgProb + '%';
+
+        const jobs = {};
+        historyData.forEach(h => {
+            const job = h.client.job || 'unknown';
+            jobs[job] = (jobs[job] || 0) + 1;
+        });
+
+        const sortedJobs = Object.entries(jobs).sort((a, b) => b[1] - a[1]);
+
+        const jobContainer = document.getElementById('jobDistribution');
+        if (jobContainer) {
+            if (sortedJobs.length === 0) {
+                jobContainer.innerHTML = '<div class="job-item"><span>No data yet</span><span>0</span></div>';
+            } else {
+                jobContainer.innerHTML = sortedJobs.slice(0, 6).map(([job, count]) => `
+                    <div class="job-item"><span>${job}</span><span>${count}</span></div>
+                `).join('');
+            }
+        }
+    }
+
+    // ============================================================
+    // BULK UPLOAD
+    // ============================================================
+
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const bulkPredictBtn = document.getElementById('bulkPredictBtn');
+    const bulkResults = document.getElementById('bulkResults');
+
+    if (fileUploadArea) {
+        fileUploadArea.addEventListener('click', () => fileInput.click());
+
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileUpload(e.dataTransfer.files[0]);
+            }
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+    }
+
+    function handleFileUpload(file) {
+        if (!file.name.endsWith('.csv')) {
+            alert('Please upload a CSV file.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target.result;
+            if (bulkResults) {
+                bulkResults.innerHTML = `
+                    <div style="margin-top:16px;padding:16px;background:rgba(255,255,255,0.04);border-radius:12px;">
+                        <p style="color:rgba(255,255,255,0.6);">✅ Loaded file: ${file.name}</p>
+                        <p style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Click "Predict All" to process.</p>
+                    </div>
+                `;
+            }
+            if (bulkPredictBtn) {
+                bulkPredictBtn.style.display = 'flex';
+                bulkPredictBtn.dataset.csvData = text;
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    if (bulkPredictBtn) {
+        bulkPredictBtn.addEventListener('click', async () => {
+            const text = bulkPredictBtn.dataset.csvData;
+            if (!text) return;
+
+            const rows = text.split('\n').filter(row => row.trim());
+            if (rows.length < 2) {
+                alert('CSV file is empty or invalid.');
+                return;
+            }
+
+            const headers = rows[0].split(',').map(h => h.trim().toLowerCase());
+            bulkPredictBtn.disabled = true;
+            bulkPredictBtn.innerHTML = '<span class="loading"></span> Processing...';
+
+            const results = [];
+            for (let i = 1; i < Math.min(rows.length, 101); i++) {
+                const values = rows[i].split(',').map(v => v.trim());
+                const client = {};
+                headers.forEach((h, idx) => {
+                    const val = values[idx] || '';
+                    client[h] = isNaN(val) ? val : parseFloat(val);
+                });
+
+                try {
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(client)
+                    });
+                    const result = await response.json();
+                    results.push({ client, result });
+                } catch (e) {
+                    results.push({ client, result: { prediction: 'Error', error: e.message } });
+                }
+            }
+
+            const high = results.filter(r => r.result.prediction === 'Yes').length;
+            const low = results.filter(r => r.result.prediction === 'No').length;
+            const errors = results.filter(r => r.result.prediction === 'Error').length;
+
+            if (bulkResults) {
+                bulkResults.innerHTML = `
+                    <div style="margin-top:16px;padding:20px;background:rgba(255,255,255,0.04);border-radius:12px;">
+                        <h4 style="color:#fff;margin-bottom:12px;">📊 Bulk Results</h4>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                            <div style="background:rgba(0,230,118,0.08);padding:16px;border-radius:10px;text-align:center;">
+                                <div style="font-size:1.5rem;font-weight:700;color:#00e676;">${high}</div>
+                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);">High Potential</div>
+                            </div>
+                            <div style="background:rgba(255,82,82,0.08);padding:16px;border-radius:10px;text-align:center;">
+                                <div style="font-size:1.5rem;font-weight:700;color:#ff5252;">${low}</div>
+                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);">Low Priority</div>
+                            </div>
+                            <div style="background:rgba(255,200,0,0.08);padding:16px;border-radius:10px;text-align:center;">
+                                <div style="font-size:1.5rem;font-weight:700;color:#ffab40;">${errors}</div>
+                                <div style="font-size:0.75rem;color:rgba(255,255,255,0.4);">Errors</div>
+                            </div>
+                        </div>
+                        <p style="color:rgba(255,255,255,0.3);font-size:0.8rem;margin-top:12px;">${results.length} clients processed.</p>
+                    </div>
+                `;
+            }
+
+            // Reload leads after bulk prediction
+            await loadLeadsFromDB();
+
+            bulkPredictBtn.style.display = 'none';
+            bulkPredictBtn.disabled = false;
+            bulkPredictBtn.innerHTML = '<span class="btn-icon">🚀</span><span class="btn-text">Predict All</span>';
+        });
+    }
+
+    // ============================================================
+    // LEAD PROFILE
+    // ============================================================
+
+    function renderLeadTable(filter = '') {
+        const tbody = document.getElementById('leadTableBody');
+        if (!tbody) return;
+
+        let filtered = leadData;
+        if (filter) {
+            const f = filter.toLowerCase();
+            filtered = leadData.filter(l =>
+                l.job.toLowerCase().includes(f) ||
+                l.education.toLowerCase().includes(f) ||
+                String(l.age).includes(f) ||
+                String(l.balance).includes(f) ||
+                l.prediction.toLowerCase().includes(f)
+            );
+        }
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" class="no-data">No leads found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtered.slice(0, 100).map((lead, idx) => {
+            const isRealId = typeof lead.id === 'number' && lead.id > 0;
+            return `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="lead-checkbox" data-id="${lead.id}" ${!isRealId ? 'disabled' : ''} />
+                    </td>
+                    <td>${lead.display_id || idx + 1}</td>
+                    <td>${lead.job}</td>
+                    <td>${lead.age}</td>
+                    <td>$${lead.balance}</td>
+                    <td><span class="badge ${lead.prediction.toLowerCase()}">${lead.prediction}</span></td>
+                    <td>${lead.confidence}%</td>
+                    <td>
+                        ${isRealId ? `<button class="score-btn" onclick="fetchLeadScore(${lead.id})">📊 Score</button>` : ''}
+                        <button class="view-btn" onclick="showLeadDetail(${lead.id})">View</button>
+                        ${isRealId ? `<button class="delete-btn" onclick="deleteLead(${lead.id})">✕</button>` : ''}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function showLeadDetail(id) {
+        const lead = leadData.find(l => l.id === id);
+        if (!lead) return;
+
+        const detail = document.getElementById('leadDetail');
+        const content = document.getElementById('leadDetailContent');
+        if (!detail || !content) return;
+        
+        detail.style.display = 'block';
+
+        const d = lead.data;
+        content.innerHTML = `
+            <div class="lead-detail-grid">
+                <div class="lead-detail-item">
+                    <span class="label">Job</span>
+                    <span class="value">${d.job}</span>
+                </div>
+                <div class="lead-detail-item">
+                    <span class="label">Age</span>
+                    <span class="value">${d.age}</span>
+                </div>
+                <div class="lead-detail-item">
+                    <span class="label">Education</span>
+                    <span class="value">${d.education}</span>
+                </div>
+                <div class="lead-detail-item">
+                    <span class="label">Marital Status</span>
+                    <span class="value">${d.marital}</span>
+                </div>
+                <div class="lead-detail-item">
+                    <span class="label">Balance</span>
+                    <span class="value">$${d.balance}</span>
+                </div>
+                <div class="lead-detail-item">
+                    <span class="label">Call Duration</span>
+                    <span class="value">${d.duration}s</span>
+                </div>
+                <div class="lead-detail-item">
+                    <span class="label">Previous Outcome</span>
+                    <span class="value">${d.poutcome}</span>
+                </div>
+                <div class="lead-detail-item">
+                    <span class="label">Prediction</span>
+                    <span class="value" style="color:${lead.prediction === 'Yes' ? '#00e676' : '#ff5252'};">${lead.prediction}</span>
+                </div>
+            </div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);">
+                <span style="color:rgba(255,255,255,0.3);font-size:0.75rem;">Predicted on: ${lead.timestamp}</span>
+            </div>
+        `;
+
+        detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ============================================================
+    // SEARCH
+    // ============================================================
+
+    const searchBtn = document.getElementById('leadSearchBtn');
+    const searchInput = document.getElementById('leadSearch');
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput ? searchInput.value : '';
+            renderLeadTable(query);
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value;
+                renderLeadTable(query);
+            }
+        });
+    }
+
+    // ============================================================
+    // CLEAR VALIDATION
+    // ============================================================
+
+    document.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', () => {
+            el.style.borderColor = '';
+            el.style.boxShadow = '';
+            if (validationMsg) validationMsg.style.display = 'none';
+        });
+    });
+
+    // ============================================================
+    // LEAD SCORING
+    // ============================================================
+
+    async function fetchLeadScore(leadId) {
+        try {
+            const response = await fetch(`/lead-score/${leadId}`);
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                displayScoreBreakdown(data.score);
+                showToast('📊 Score breakdown loaded!', 'success');
+            } else {
+                showToast('Error loading score: ' + data.error, 'error');
+            }
+        } catch (error) {
+            console.error('Error fetching lead score:', error);
+            showToast('Network error loading score', 'error');
+        }
+    }
+
+    function displayScoreBreakdown(scoreData) {
+        const container = document.getElementById('scoreBreakdown');
+        const factorsContainer = document.getElementById('scoreFactors');
+        const insightsContainer = document.getElementById('insightsList');
+        
+        if (!container || !factorsContainer || !insightsContainer) {
+            console.warn('Score breakdown elements not found in DOM');
+            return;
+        }
+        
+        container.style.display = 'block';
+        document.getElementById('totalScore').textContent = scoreData.percentage;
+        
+        factorsContainer.innerHTML = scoreData.breakdown.map(factor => {
+            const percentage = (factor.score / factor.max_score) * 100;
+            return `
+                <div class="score-factor">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 2px;">
+                        <span style="color: rgba(255,255,255,0.6);">
+                            ${factor.icon} ${factor.factor}
+                        </span>
+                        <span style="color: ${factor.level === 'high' ? '#00e676' : factor.level === 'medium' ? '#ffab40' : '#ff5252'}; font-weight: 600;">
+                            ${factor.score}/${factor.max_score}
+                        </span>
+                    </div>
+                    <div class="score-bar-track">
+                        <div class="score-bar-fill ${factor.level}" style="width: ${percentage}%;"></div>
+                    </div>
+                    <div style="font-size: 0.65rem; color: rgba(255,255,255,0.3); margin-top: 1px;">
+                        ${factor.description}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        insightsContainer.innerHTML = scoreData.insights.map(insight => `
+            <div style="padding: 4px 0; display: flex; align-items: flex-start; gap: 8px;">
+                <span style="font-size: 0.9rem;">💡</span>
+                <span>${insight}</span>
+            </div>
+        `).join('');
+    }
+
+    // ============================================================
+    // TOAST NOTIFICATIONS
+    // ============================================================
+
+    function showToast(message, type = 'info') {
+        const existing = document.querySelector('.toast-container');
+        if (existing) existing.remove();
+        
+        const container = document.createElement('div');
+        container.className = 'toast-container';
+        container.style.cssText = `
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            max-width: 400px;
+            width: 100%;
+        `;
+        
+        const toast = document.createElement('div');
+        const colors = {
+            success: 'rgba(0,230,118,0.15)',
+            error: 'rgba(255,82,82,0.15)',
+            info: 'rgba(255,200,0,0.15)'
+        };
+        const borderColors = {
+            success: 'rgba(0,230,118,0.3)',
+            error: 'rgba(255,82,82,0.3)',
+            info: 'rgba(255,200,0,0.3)'
+        };
+        
+        toast.style.cssText = `
+            padding: 16px 20px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            backdrop-filter: blur(20px);
+            animation: slideIn 0.3s ease;
+            border: 1px solid ${borderColors[type] || borderColors.info};
+            background: ${colors[type] || colors.info};
+        `;
+        toast.textContent = message;
+        
+        container.appendChild(toast);
+        document.body.appendChild(container);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(20px)';
+            toast.style.transition = 'all 0.3s ease';
+            setTimeout(() => container.remove(), 300);
+        }, 4000);
+    }
+
+    // ============================================================
+    // DELETE FUNCTIONS
+    // ============================================================
+
+    async function deleteLead(id) {
+        if (!confirm('Are you sure you want to delete this lead?')) return;
+        
+        try {
+            const response = await fetch(`/leads/${id}`, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                historyData = historyData.filter(h => h.id !== id);
+                leadData = leadData.filter(l => l.id !== id);
+                predictionCount = historyData.length;
+                
+                renderHistory();
+                updateDashboard();
+                updateAnalytics();
+                renderLeadTable();
+                
+                const detail = document.getElementById('leadDetail');
+                if (detail) detail.style.display = 'none';
+                showToast('Lead deleted successfully', 'success');
+            } else {
+                showToast('Error deleting lead: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showToast('Network error: ' + error.message, 'error');
+        }
+    }
+
+    async function clearAllLeads() {
+        const total = leadData.length;
+        if (total === 0) {
+            showToast('No leads to clear', 'info');
+            return;
+        }
+        
+        if (!confirm(`⚠️ Are you sure you want to delete ALL ${total} leads? This action cannot be undone!`)) return;
+        if (!confirm(`⚠️⚠️ FINAL CONFIRMATION: Delete all ${total} leads?`)) return;
+        
+        try {
+            const response = await fetch('/leads/clear?confirm=true', {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                historyData = [];
+                leadData = [];
+                predictionCount = 0;
+                
+                renderHistory();
+                updateDashboard();
+                updateAnalytics();
+                renderLeadTable();
+                
+                const detail = document.getElementById('leadDetail');
+                if (detail) detail.style.display = 'none';
+                showToast(`✅ ${data.deleted_count} leads cleared successfully`, 'success');
+            } else {
+                showToast('Error clearing leads: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showToast('Network error: ' + error.message, 'error');
+        }
+    }
+
+    function toggleAllCheckboxes(master) {
+        document.querySelectorAll('.lead-checkbox').forEach(cb => {
+            cb.checked = master.checked;
+        });
+        updateSelectedCount();
+    }
+
+    function selectAllLeads() {
+        document.querySelectorAll('.lead-checkbox').forEach(cb => cb.checked = true);
+        updateSelectedCount();
+    }
+
+    function deselectAllLeads() {
+        document.querySelectorAll('.lead-checkbox').forEach(cb => cb.checked = false);
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        const count = document.querySelectorAll('.lead-checkbox:checked').length;
+        const el = document.getElementById('selectedCount');
+        if (el) el.textContent = `${count} selected`;
+    }
+
+    function getSelectedLeadIds() {
+        return Array.from(document.querySelectorAll('.lead-checkbox:checked'))
+            .map(cb => parseInt(cb.dataset.id));
+    }
+
+    async function deleteSelectedLeadsFromUI() {
+        const ids = getSelectedLeadIds();
+        if (ids.length === 0) {
+            showToast('No leads selected', 'info');
+            return;
+        }
+        
+        if (!confirm(`Delete ${ids.length} selected leads?`)) return;
+        
+        let deleted = 0;
+        for (const id of ids) {
+            try {
+                const response = await fetch(`/leads/${id}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) deleted++;
+            } catch (e) {
+                console.error(`Failed to delete lead ${id}:`, e);
+            }
+        }
+        
+        await loadLeadsFromDB();
+        showToast(`Deleted ${deleted} leads`, 'success');
+    }
+
+    async function refreshLeads() {
+        showToast('Refreshing leads...', 'info');
+        await loadLeadsFromDB();
+        showToast('Leads refreshed', 'success');
+    }
+
+    function addBulkActions() {
+        const leadTable = document.querySelector('.lead-profile-content');
+        if (!leadTable) return;
+        if (document.querySelector('.bulk-actions')) return;
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'bulk-actions';
+        actionsDiv.style.cssText = `
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 8px 0;
+        `;
+        actionsDiv.innerHTML = `
+            <button class="search-btn" onclick="selectAllLeads()" style="background:rgba(255,255,255,0.05);color:#fff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;">
+                ☑ Select All
+            </button>
+            <button class="search-btn" onclick="deselectAllLeads()" style="background:rgba(255,255,255,0.05);color:#fff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;">
+                ☐ Deselect All
+            </button>
+            <button class="search-btn" onclick="deleteSelectedLeadsFromUI()" style="background:rgba(255,50,50,0.15);color:#ff5252;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;">
+                🗑 Delete Selected
+            </button>
+            <button class="search-btn" onclick="clearAllLeads()" style="background:rgba(255,50,50,0.2);color:#ff5252;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;">
+                🗑 Clear All
+            </button>
+            <button class="search-btn" onclick="refreshLeads()" style="background:rgba(0,128,255,0.15);color:#0080ff;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:0.8rem;">
+                🔄 Refresh
+            </button>
+            <span id="selectedCount" style="color:rgba(255,255,255,0.4);font-size:0.8rem;margin-left:auto;padding:4px 12px;background:rgba(255,255,255,0.04);border-radius:20px;">0 selected</span>
+        `;
+        
+        const searchDiv = leadTable.querySelector('.lead-search');
+        if (searchDiv && searchDiv.parentNode) {
+            searchDiv.parentNode.insertBefore(actionsDiv, searchDiv.nextSibling);
+        }
+    }
+
+    // ============================================================
+    // AI CAMPAIGN ANALYST
+    // ============================================================
+
+    let isProcessing = false;
+    let chatHistory = [];
+    let historyPanelOpen = false;
+
+    async function checkAIHealth() {
+        try {
+            const response = await fetch('/ai/health');
+            const data = await response.json();
+            const statusEl = document.getElementById('aiStatus');
+            if (statusEl) {
+                if (data.available) {
+                    statusEl.textContent = '🟢 Online';
+                    statusEl.style.color = '#00e676';
+                } else {
+                    statusEl.textContent = '🔴 Offline';
+                    statusEl.style.color = '#ff5252';
+                }
+            }
+        } catch (error) {
+            console.error('AI health check failed:', error);
+        }
+    }
+
+    async function askAI() {
+        const questionInput = document.getElementById('aiQuestion');
+        if (!questionInput) return;
+        
+        const question = questionInput.value.trim();
+        if (!question) {
+            addMessage('bot', '⚠️ Please enter a question.');
+            return;
+        }
+        
+        if (isProcessing) return;
+        
+        isProcessing = true;
+        
+        addMessage('user', question);
+        questionInput.value = '';
+        addTypingIndicator();
+        
+        try {
+            const response = await fetch('/ai/ask', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: question })
+            });
+            
+            const data = await response.json();
+            removeTypingIndicator();
+            
+            if (data.status === 'success') {
+                addMessage('bot', data.answer);
+                chatHistory.push({
+                    id: Date.now(),
+                    question: question,
+                    answer: data.answer,
+                    timestamp: new Date().toISOString()
+                });
+                const countEl = document.getElementById('historyCount');
+                if (countEl) countEl.textContent = chatHistory.length;
+                renderHistoryPanel();
+            } else {
+                addMessage('bot', '❌ Error: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            removeTypingIndicator();
+            addMessage('bot', '❌ Network error. Please try again.');
+        }
+        
+        isProcessing = false;
+    }
+
+    function quickAsk(action) {
+        if (isProcessing) return;
+        
+        const questions = {
+            'summary': 'Give me an overview of my campaign performance.',
+            'trends': 'What are the key trends in my lead data?',
+            'top performers': 'Who are my top performing lead types?',
+            'recommendations': 'What strategic recommendations do you have for improving my campaign?'
+        };
+        
+        const question = questions[action];
+        if (!question) return;
+        
+        const questionInput = document.getElementById('aiQuestion');
+        if (questionInput) {
+            questionInput.value = question;
+            askAI();
+        }
+    }
+
+    function addMessage(type, content) {
+        const container = document.getElementById('aiMessages');
+        if (!container) return;
+        
+        const div = document.createElement('div');
+        div.className = `ai-message ${type}`;
+        const avatar = type === 'bot' ? '🤖' : '👤';
+        
+        let formattedContent = content;
+        formattedContent = formattedContent
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/^### (.*$)/gim, '<h4>$1</h4>')
+            .replace(/^## (.*$)/gim, '<h3>$1</h3>')
+            .replace(/^# (.*$)/gim, '<h2>$1</h2>')
+            .replace(/^- (.*$)/gim, '<li>$1</li>')
+            .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
+            .replace(/\n/g, '<br>');
+        
+        formattedContent = formattedContent
+            .replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>')
+            .replace(/<ul><\/ul>/g, '');
+        
+        div.innerHTML = `
+            <div class="message-avatar">${avatar}</div>
+            <div class="message-content">${formattedContent}</div>
+        `;
+        
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function addTypingIndicator() {
+        const container = document.getElementById('aiMessages');
+        if (!container) return;
+        
+        const div = document.createElement('div');
+        div.className = 'ai-message bot typing';
+        div.id = 'typingIndicator';
+        div.innerHTML = `
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+                <span class="typing-dots">
+                    <span>.</span><span>.</span><span>.</span>
+                </span>
+            </div>
+        `;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) indicator.remove();
+    }
+
+    function renderHistoryPanel() {
+        const container = document.getElementById('historyList');
+        if (!container) return;
+        
+        if (chatHistory.length === 0) {
+            container.innerHTML = '<p class="history-empty">No chat history yet.</p>';
+            return;
+        }
+        
+        container.innerHTML = chatHistory.slice().reverse().map(item => `
+            <div class="history-item">
+                <div class="history-question">${escapeHtml(item.question)}</div>
+                <div class="history-preview">${escapeHtml(item.answer.slice(0, 100))}...</div>
+                <div class="history-time">${formatTime(item.timestamp)}</div>
+            </div>
+        `).join('');
+    }
+
+    function toggleHistory() {
+        historyPanelOpen = !historyPanelOpen;
+        const panel = document.getElementById('historyPanel');
+        if (panel) {
+            panel.style.display = historyPanelOpen ? 'block' : 'none';
+        }
+    }
+
+    function formatTime(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    async function loadLeadsDropdown() {
+        try {
+            const response = await fetch('/leads?limit=100');
+            const data = await response.json();
+            
+            const select = document.getElementById('aiLeadSelect');
+            if (!select) return;
+            
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Select a lead...</option>';
+            
+            if (data.leads && data.leads.length > 0) {
+                data.leads.forEach(lead => {
+                    const client = lead.client_data;
+                    const option = document.createElement('option');
+                    option.value = lead.id;
+                    option.textContent = `#${lead.display_id} - ${client.job || 'Unknown'} (${client.age || '?'}yrs) - ${lead.prediction}`;
+                    select.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No leads found - make some predictions!';
+                select.appendChild(option);
+            }
+            
+            if (currentValue) {
+                select.value = currentValue;
+            }
+        } catch (error) {
+            console.error('Error loading leads:', error);
+        }
+    }
+
+    // ============================================================
+    // INITIALIZE
+    // ============================================================
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔧 Initializing LeadScout...');
+        
+        // CRITICAL: Load leads from database on page load
+        loadLeadsFromDB();
+        
+        // Add bulk actions
+        setTimeout(addBulkActions, 500);
+        
+        // AI Assistant
+        checkAIHealth();
+        
+        // AI tab click handler
+        document.querySelector('[data-tab="ai"]')?.addEventListener('click', function() {
+            loadLeadsDropdown();
+            checkAIHealth();
+        });
+        
+        // AI question enter key
+        document.getElementById('aiQuestion')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                askAI();
+            }
+        });
+        
+        // Checkbox change handler
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('lead-checkbox')) {
+                updateSelectedCount();
+            }
+        });
+        
+        console.log('✅ LeadScout UI ready!');
+        console.log(`📊 ${historyData.length} leads loaded from database`);
+    });
+
+</script>
+</body>
+</html>

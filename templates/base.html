@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadScout - AI-Powered Lead Scoring</title>
+    <style>
+        /* ============================================================
+           LANDING PAGE - Particle Animation & Dynamic Blue Theme
+           ============================================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0e1a;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #e0e8f0;
+        }
+
+        /* ===== PARTICLE CANVAS ===== */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* ===== LANDING CONTAINER ===== */
+        .landing-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        /* ===== HERO CONTENT ===== */
+        .hero-content {
+            max-width: 1000px;
+            width: 92%;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* ===== LOGO SECTION ===== */
+        .logo-section {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 8px;
+            opacity: 0;
+            animation: fadeInDown 1.2s ease 0.5s forwards;
+        }
+
+        .logo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 240px;
+            height: 110px;
+            background: radial-gradient(ellipse, rgba(0, 212, 255, 0.15), transparent 70%);
+            border-radius: 50%;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-icon {
+            font-size: 3.8rem;
+            display: block;
+            animation: float 4s ease-in-out infinite;
+            line-height: 1;
+        }
+
+        .logo-title {
+            font-size: 4.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff, #0080ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            display: block;
+            line-height: 1;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TAGLINE ===== */
+        .tagline-section {
+            margin-bottom: 30px;
+            min-height: 50px;
+            opacity: 0;
+            animation: fadeInUp 1s ease 1.2s forwards;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.5px;
+        }
+
+        .tagline .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.5rem;
+            background: #00d4ff;
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== FEATURE GRID ===== */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 150, 255, 0.1);
+            border-radius: 16px;
+            padding: 28px 20px;
+            text-align: center;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .feature-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 150, 255, 0.3);
+            box-shadow: 0 8px 40px rgba(0, 100, 255, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.6rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.5;
+        }
+
+        /* ===== STATS ROW ===== */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 35px;
+        }
+
+        .stat-item {
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .stat-item.visible {
+            opacity: 1;
+            transform: scale(1);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #0080ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 4px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== CTA GROUP ===== */
+        .cta-group {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 2.5s forwards;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 36px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+        }
+
+        .cta-button.primary {
+            background: linear-gradient(135deg, #0080ff, #00d4ff);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 128, 255, 0.3);
+        }
+
+        .cta-button.primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 40px rgba(0, 128, 255, 0.4);
+        }
+
+        .cta-button.secondary {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .cta-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .cta-button .btn-arrow {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button.primary:hover .btn-arrow {
+            transform: translateX(6px);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero-content {
+                width: 95%;
+            }
+            
+            .logo-title {
+                font-size: 2.8rem;
+            }
+            .logo-icon {
+                font-size: 2.8rem;
+            }
+            .logo-glow {
+                width: 160px;
+                height: 80px;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+            }
+            .tagline-section {
+                min-height: 40px;
+                margin-bottom: 24px;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-bottom: 24px;
+            }
+            
+            .feature-card {
+                padding: 20px 16px;
+            }
+            .feature-icon {
+                font-size: 2rem;
+                margin-bottom: 8px;
+            }
+            .feature-card h3 {
+                font-size: 0.95rem;
+            }
+            .feature-card p {
+                font-size: 0.8rem;
+            }
+            
+            .stats-row {
+                gap: 30px;
+                margin-bottom: 28px;
+                flex-wrap: wrap;
+            }
+            
+            .stat-number {
+                font-size: 2.2rem;
+            }
+            .stat-label {
+                font-size: 0.7rem;
+            }
+            
+            .cta-group {
+                gap: 12px;
+            }
+            
+            .cta-button {
+                padding: 14px 28px;
+                font-size: 0.95rem;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-title {
+                font-size: 2.2rem;
+            }
+            .logo-icon {
+                font-size: 2.2rem;
+            }
+            .logo-glow {
+                width: 120px;
+                height: 60px;
+            }
+            .logo-wrapper {
+                gap: 10px;
+            }
+            
+            .tagline {
+                font-size: 0.9rem;
+            }
+            
+            .stats-row {
+                gap: 16px;
+            }
+            .stat-number {
+                font-size: 1.8rem;
+            }
+            
+            .cta-button {
+                padding: 12px 20px;
+                font-size: 0.85rem;
+                gap: 8px;
+            }
+            
+            .feature-card {
+                padding: 16px 12px;
+            }
+            .feature-icon {
+                font-size: 1.6rem;
+            }
+            .feature-card h3 {
+                font-size: 0.85rem;
+            }
+            .feature-card p {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* ============================================================
+           PARTICLE ANIMATION & INTERACTIONS
+           ============================================================ */
+    </style>
+</head>
+<body>
+
+<!-- ===== PARTICLE CANVAS ===== -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- ===== LANDING CONTAINER ===== -->
+<div class="landing-container">
+    <div class="hero-content">
+        
+        <!-- Logo -->
+        <div class="logo-section">
+            <div class="logo-glow"></div>
+            <div class="logo-wrapper">
+                <span class="logo-icon">🎯</span>
+                <span class="logo-title">LeadScout</span>
+            </div>
+        </div>
+
+        <!-- Tagline -->
+        <div class="tagline-section">
+            <p class="tagline" id="typingText">
+                🤖 AI-Powered Lead Scoring &amp; Prioritization Platform
+            </p>
+        </div>
+
+        <!-- Features -->
+        <div class="feature-grid">
+            <div class="feature-card" data-delay="1400">
+                <span class="feature-icon">📊</span>
+                <h3>Smart Predictions</h3>
+                <p>AI-driven lead scoring to identify your best prospects instantly.</p>
+            </div>
+            <div class="feature-card" data-delay="1700">
+                <span class="feature-icon">🎯</span>
+                <h3>Precision Targeting</h3>
+                <p>Focus your marketing efforts on high-conversion potential leads.</p>
+            </div>
+            <div class="feature-card" data-delay="2000">
+                <span class="feature-icon">🧠</span>
+                <h3>AI Insights</h3>
+                <p>Get personalized strategies and recommendations for every lead.</p>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="stat-number" data-target="94">0</span>
+                <span class="stat-label">Prediction Accuracy</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="3">0</span>
+                <span class="stat-label">× Faster Targeting</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="87">0</span>
+                <span class="stat-label">Lead Conversion Rate</span>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-group">
+            <a href="{{ url_for('app_main') }}" class="cta-button primary">
+                🚀 Launch App
+                <span class="btn-arrow">→</span>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+// ============================================================
+// PARTICLE SYSTEM
+// ============================================================
+class ParticleNetwork {
+    constructor() {
+        this.canvas = document.getElementById('particleCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.mouse = { x: null, y: null };
+        this.connectionDistance = 120;
+        
+        this.init();
+        this.bindEvents();
+        this.animate();
+    }
+    
+    init() {
+        this.resize();
+        
+        const particleCount = Math.min(
+            window.innerWidth < 768 ? 80 : 120,
+            120
+        );
+        
+        for (let i = 0; i < particleCount; i++) {
+            this.particles.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                radius: Math.random() * 2 + 1,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                opacity: Math.random() * 0.6 + 0.2
+            });
+        }
+    }
+    
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+    
+    bindEvents() {
+        window.addEventListener('resize', () => {
+            this.resize();
+        });
+        
+        this.canvas.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        });
+        
+        this.canvas.addEventListener('mouseleave', () => {
+            this.mouse.x = null;
+            this.mouse.y = null;
+        });
+        
+        this.canvas.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            this.mouse.x = touch.clientX;
+            this.mouse.y = touch.clientY;
+        }, { passive: true });
+        
+        this.canvas.addEventListener('touchend', () => {
+            this.mouse.x = null;
+            this.mouse.y = null;
+        });
+    }
+    
+    animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        for (let i = 0; i < this.particles.length; i++) {
+            const p = this.particles[i];
+            
+            p.x += p.vx;
+            p.y += p.vy;
+            
+            if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = `rgba(100, 200, 255, ${p.opacity})`;
+            this.ctx.fill();
+            
+            for (let j = i + 1; j < this.particles.length; j++) {
+                const p2 = this.particles[j];
+                const dx = p.x - p2.x;
+                const dy = p.y - p2.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < this.connectionDistance) {
+                    const opacity = 1 - (dist / this.connectionDistance);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(p.x, p.y);
+                    this.ctx.lineTo(p2.x, p2.y);
+                    this.ctx.strokeStyle = `rgba(0, 150, 255, ${opacity * 0.4})`;
+                    this.ctx.lineWidth = 0.8;
+                    this.ctx.stroke();
+                }
+            }
+        }
+        
+        if (this.mouse.x !== null && this.mouse.y !== null) {
+            for (const p of this.particles) {
+                const dx = p.x - this.mouse.x;
+                const dy = p.y - this.mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < 150) {
+                    const force = (150 - dist) / 150 * 1.5;
+                    p.vx += (dx / dist) * force * 0.02;
+                    p.vy += (dy / dist) * force * 0.02;
+                }
+            }
+        }
+        
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// ============================================================
+// TYPING ANIMATION
+// ============================================================
+class TypeWriter {
+    constructor(element, text, speed = 40) {
+        this.element = element;
+        this.text = text;
+        this.speed = speed;
+        this.index = 0;
+    }
+    
+    start() {
+        this.type();
+    }
+    
+    type() {
+        if (this.index <= this.text.length) {
+            this.element.innerHTML = this.text.substring(0, this.index) + '<span class="cursor"></span>';
+            this.index++;
+            setTimeout(() => this.type(), this.speed);
+        }
+    }
+}
+
+// ============================================================
+// FEATURE CARD ANIMATION
+// ============================================================
+function animateFeatureCards() {
+    const cards = document.querySelectorAll('.feature-card');
+    
+    cards.forEach((card, index) => {
+        const delay = parseInt(card.dataset.delay) || 0;
+        setTimeout(() => {
+            card.classList.add('visible');
+        }, 1400 + delay);
+    });
+}
+
+// ============================================================
+// STAT COUNTER ANIMATION
+// ============================================================
+function animateStats() {
+    const stats = document.querySelectorAll('.stat-number');
+    
+    stats.forEach((stat, index) => {
+        const target = parseInt(stat.dataset.target);
+        const duration = 2000;
+        const startTime = performance.now() + 1800 + (index * 300);
+        
+        setTimeout(() => {
+            stat.parentElement.classList.add('visible');
+        }, 1800 + (index * 300));
+        
+        function updateCounter(currentTime) {
+            const elapsed = currentTime - startTime;
+            if (elapsed < 0) {
+                requestAnimationFrame(updateCounter);
+                return;
+            }
+            
+            const progress = Math.min(elapsed / duration, 1);
+            const current = Math.floor(progress * target);
+            stat.textContent = current + (progress < 1 && target > 50 ? '+' : '');
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            } else {
+                stat.textContent = target + '%';
+            }
+        }
+        
+        requestAnimationFrame(updateCounter);
+    });
+}
+
+// ============================================================
+// INITIALIZE
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Start particle network
+    new ParticleNetwork();
+    
+    // Start typing animation
+    const tagline = document.getElementById('typingText');
+    const text = '🤖 AI-Powered Lead Scoring & Prioritization Platform';
+    const typer = new TypeWriter(tagline, text, 45);
+    setTimeout(() => typer.start(), 800);
+    
+    // Animate features and stats
+    animateFeatureCards();
+    animateStats();
+    
+    console.log('🚀 LeadScout Landing Page loaded!');
+});
+
+// ===== PREVENT SCROLLING ON LANDING =====
+document.addEventListener('wheel', function(e) {
+    if (!document.querySelector('.landing-container')) return;
+    e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchmove', function(e) {
+    if (!document.querySelector('.landing-container')) return;
+    e.preventDefault();
+}, { passive: false });
+</script>
+
+</body>
+</html>

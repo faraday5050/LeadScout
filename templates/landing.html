@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}LeadScout — Smart Lead Prioritization{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style-landing.css') }}" />
+{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* Override base styles for landing page */
+    body {
+        background: #0a0e1a;
+        overflow: hidden;
+    }
+    .flash-container {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Particle Canvas -->
+<canvas id="particleCanvas"></canvas>
+
+<!-- Landing Content -->
+<div class="landing-container">
+    <div class="hero-content">
+        <!-- Logo -->
+        <div class="logo-section">
+            <div class="logo-glow"></div>
+            <div class="logo-wrapper">
+                <span class="logo-icon">🎯</span>
+                <h1 class="logo-title">LeadScout</h1>
+            </div>
+        </div>
+
+        <!-- Tagline -->
+        <div class="tagline-section">
+            <p class="tagline" id="typingText"></p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="feature-grid">
+            <div class="feature-card" data-delay="0">
+                <div class="feature-icon">🤖</div>
+                <h3>AI-Powered Scoring</h3>
+                <p>Predicts which clients are most likely to subscribe with 81% accuracy</p>
+            </div>
+            <div class="feature-card" data-delay="200">
+                <div class="feature-icon">📊</div>
+                <h3>Real-time Analytics</h3>
+                <p>Live dashboard with campaign performance and lead quality insights</p>
+            </div>
+            <div class="feature-card" data-delay="400">
+                <div class="feature-icon">⚡</div>
+                <h3>Smart Prioritization</h3>
+                <p>Focus your efforts on high-potential leads and reduce wasted calls by 70%</p>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="stat-number" data-target="81">0</span>
+                <span class="stat-label">% Accuracy</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="70">0</span>
+                <span class="stat-label">% Less Calls</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="85">0</span>
+                <span class="stat-label">% Confidence</span>
+            </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="cta-group">
+            <a href="{{ url_for('login_page') }}" class="cta-button primary">
+                <span class="btn-text">Get Started</span>
+                <span class="btn-arrow">→</span>
+            </a>
+            <a href="{{ url_for('register_page') }}" class="cta-button secondary">
+                <span class="btn-text">Create Account</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/script-landing.js') }}"></script>
+{% endblock %}
